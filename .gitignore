@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtualenv
+.venv/
+venv/
+env/
+
+# Secrets — never commit a filled-in copy
+.env
+.env.*
+!.env.example
+
+# Editors / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Logs
+*.log
+
+# Resume files from local runs
+.qbt-migrate-state.json
+
+# qBittorrent runtime files written into the Docker test bind mounts
+tests/integration/*-config/qBittorrent/logs/
+tests/integration/*-config/qBittorrent/BT_backup/
+tests/integration/*-config/qBittorrent/*.lock
+tests/integration/*-config/qBittorrent/ipc-socket
+tests/integration/*-config/qBittorrent/.cache/
