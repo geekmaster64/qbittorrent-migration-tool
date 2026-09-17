@@ -31,17 +31,24 @@ FILE_BYTES = b"qbittorrent-migration-tool live test\n"
 PIECE_LENGTH = 16384
 
 
-def tiny_torrent_bytes() -> bytes:
-    info = {
+def tiny_info_dict() -> dict[bytes, object]:
+    return {
         b"name": FILE_NAME.encode(),
         b"piece length": PIECE_LENGTH,
         b"pieces": hashlib.sha1(FILE_BYTES).digest(),
         b"length": len(FILE_BYTES),
     }
+
+
+def tiny_torrent_bytes() -> bytes:
     return bencode(
         {
             b"announce": b"http://127.0.0.1:9/announce",
             b"comment": b"fixture for qbittorrent-migration-tool",
-            b"info": info,
+            b"info": tiny_info_dict(),
         }
     )
+
+
+def tiny_infohash() -> str:
+    return hashlib.sha1(bencode(tiny_info_dict())).hexdigest()

@@ -23,10 +23,15 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+import qbittorrentapi
+
 import torrent_transfer as tt
-from tests.torrent_fixture import FILE_NAME, tiny_torrent_bytes
+from tests.torrent_fixture import FILE_NAME, tiny_infohash, tiny_torrent_bytes
 
 TINY_TORRENT = tiny_torrent_bytes()
+TINY_HASH = tiny_infohash()
+CATEGORY = "live-test"
+SAVE_PATH = "/downloads/live-test"
 
 LIVE = os.environ.get("QBT_LIVE") == "1"
 
@@ -63,18 +68,10 @@ class LiveMigrationTests(unittest.TestCase):
         source = _wait_for(source_host, user, password)
         dest = _wait_for(dest_host, dest_user, dest_password)
 
-        try:
-            source.torrent_categories.create_category(name="live-test", save_path="/downloads/live-test")
-        except Exception:
-            pass
-        source.torrents_add(
-            torrent_files=TINY_TORRENT,
-            category="live-test",
-            is_paused=True,
-            is_stopped=True,
-            is_skip_checking=True,
-            save_path="/downloads/live-test",
-        )
+        self._ensure_category(source, CATEGORY, SAVE_PATH)
+        # Drop dest copy so a re-run actually migrates instead of skip-existing.
+        self._delete_torrent(dest, TINY_HASH)
+        self._ensure_torrent(source)
 
         code = tt.main(
             [
@@ -91,15 +88,52 @@ class LiveMigrationTests(unittest.TestCase):
                 "--dest-pass",
                 dest_password,
                 "--category",
-                "live-test",
+                CATEGORY,
                 "--yes",
             ]
         )
         self.assertEqual(code, 0)
         dest_categories = dest.torrent_categories.categories
-        self.assertIn("live-test", dest_categories)
+        self.assertIn(CATEGORY, dest_categories)
         dest_names = {torrent.name for torrent in dest.torrents_info()}
         self.assertIn(FILE_NAME, dest_names)
+
+    @staticmethod
+    def _ensure_category(client, name: str, save_path: str) -> None:
+        try:
+            client.torrent_categories.create_category(name=name, save_path=save_path)
+        except Exception:
+            pass
+
+    @staticmethod
+    def _delete_torrent(client, torrent_hash: str) -> None:
+        try:
+            client.torrents_delete(delete_files=False, torrent_hashes=torrent_hash)
+        except Exception:
+            pass
+        deadline = time.time() + 10
+        while time.time() < deadline:
+            hashes = {str(torrent.hash).lower() for torrent in client.torrents_info()}
+            if torrent_hash.lower() not in hashes:
+                return
+            time.sleep(0.2)
+
+    @staticmethod
+    def _ensure_torrent(client) -> None:
+        hashes = {str(torrent.hash).lower() for torrent in client.torrents_info()}
+        if TINY_HASH in hashes:
+            return
+        try:
+            client.torrents_add(
+                torrent_files=TINY_TORRENT,
+                category=CATEGORY,
+                is_paused=True,
+                is_stopped=True,
+                is_skip_checking=True,
+                save_path=SAVE_PATH,
+            )
+        except qbittorrentapi.Conflict409Error:
+            return
 
 
 if __name__ == "__main__":
