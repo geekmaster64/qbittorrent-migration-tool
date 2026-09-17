@@ -32,6 +32,11 @@ env/
 # qBittorrent runtime files written into the Docker test bind mounts
 tests/integration/*-config/qBittorrent/logs/
 tests/integration/*-config/qBittorrent/BT_backup/
+tests/integration/*-config/qBittorrent/GeoDB/
+tests/integration/*-config/qBittorrent/rss/
 tests/integration/*-config/qBittorrent/*.lock
+tests/integration/*-config/qBittorrent/lockfile
 tests/integration/*-config/qBittorrent/ipc-socket
 tests/integration/*-config/qBittorrent/.cache/
+tests/integration/*-config/qBittorrent/categories.json
+tests/integration/*-config/qBittorrent/watched_folders.json
