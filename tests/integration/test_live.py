@@ -24,9 +24,9 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import torrent_transfer as tt
+from tests.torrent_fixture import FILE_NAME, tiny_torrent_bytes
 
-TINY_INFO = b"d4:name4:tiny12:piece lengthi16e6:pieces0:6:lengthi0ee"
-TINY_TORRENT = b"d8:announce0:4:info" + TINY_INFO + b"e"
+TINY_TORRENT = tiny_torrent_bytes()
 
 LIVE = os.environ.get("QBT_LIVE") == "1"
 
@@ -99,7 +99,7 @@ class LiveMigrationTests(unittest.TestCase):
         dest_categories = dest.torrent_categories.categories
         self.assertIn("live-test", dest_categories)
         dest_names = {torrent.name for torrent in dest.torrents_info()}
-        self.assertIn("tiny", dest_names)
+        self.assertIn(FILE_NAME, dest_names)
 
 
 if __name__ == "__main__":

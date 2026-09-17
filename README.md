@@ -235,7 +235,7 @@ Unit tests and the fake Web API test do not need a live qBittorrent. To run two 
 
 ```bash
 docker compose -f docker-compose.test.yml up -d
-QBT_LIVE=1 python tests/integration/test_live.py
+QBT_LIVE=1 python3 tests/integration/test_live.py
 docker compose -f docker-compose.test.yml down -v
 ```
 

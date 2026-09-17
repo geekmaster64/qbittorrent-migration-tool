@@ -21,10 +21,9 @@ except ImportError:
     qbittorrentapi = None  # type: ignore[misc, assignment]
 
 import torrent_transfer as tt
+from tests.torrent_fixture import FILE_NAME, tiny_torrent_bytes
 
-
-TINY_INFO = b"d4:name4:tiny12:piece lengthi16e6:pieces0:6:lengthi0ee"
-TINY_TORRENT = b"d8:announce0:4:info" + TINY_INFO + b"e"
+TINY_TORRENT = tiny_torrent_bytes()
 TINY_HASH = tt.infohash_of_torrent_bytes(TINY_TORRENT) or "abc123"
 
 
@@ -37,7 +36,7 @@ class FakeQbtState:
         self.torrents = [
             {
                 "hash": TINY_HASH,
-                "name": "tiny",
+                "name": FILE_NAME,
                 "category": "tv",
                 "tags": "hd",
                 "save_path": "/data/tv",
@@ -140,7 +139,7 @@ def make_handler(state: FakeQbtState):
                     state.torrents.append(
                         {
                             "hash": TINY_HASH,
-                            "name": "tiny",
+                            "name": FILE_NAME,
                             "category": "tv",
                             "tags": "hd",
                             "save_path": "/data/tv",

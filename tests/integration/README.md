@@ -4,7 +4,9 @@ Spins up two linuxserver qBittorrent containers (admin / adminadmin) and copies 
 
 ```bash
 docker compose -f docker-compose.test.yml up -d
-QBT_LIVE=1 python tests/integration/test_live.py
+QBT_LIVE=1 python3 tests/integration/test_live.py
+# or, from this repo after `pip install -e .`:
+# QBT_LIVE=1 .venv/bin/python tests/integration/test_live.py
 docker compose -f docker-compose.test.yml down -v
 ```
 
